@@ -1,4 +1,4 @@
-namespace Zarr
+namespace ZarrTesting
 {
     internal static class Program
     {
