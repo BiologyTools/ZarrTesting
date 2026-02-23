@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+	<ItemGroup>
+    <ProjectReference Include="..\..\AForgeBio\AForgeBio\AForgeBio.csproj" />
+    <ProjectReference Include="..\..\BioLib\BioLib.csproj" />
+    <ProjectReference Include="..\..\ZarrNET\OmeZarr.csproj" />
+  </ItemGroup>
+</Project>

@@ -151,7 +151,7 @@ namespace Zarr
             pathBox.Name = "pathBox";
             pathBox.Size = new Size(433, 23);
             pathBox.TabIndex = 5;
-            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.2/6001240.zarr";
+            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.3/idr0109A/12922361.zarr";
             // 
             // hScrollBar
             // 
