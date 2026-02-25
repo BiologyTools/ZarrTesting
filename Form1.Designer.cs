@@ -45,6 +45,7 @@ namespace Zarr
             pathBox = new TextBox();
             hScrollBar = new HScrollBar();
             vScrollBar = new VScrollBar();
+            statuslabel = new Label();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
@@ -80,9 +81,9 @@ namespace Zarr
             // pictureBox
             // 
             pictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox.Location = new Point(0, 59);
+            pictureBox.Location = new Point(0, 75);
             pictureBox.Name = "pictureBox";
-            pictureBox.Size = new Size(525, 265);
+            pictureBox.Size = new Size(525, 249);
             pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
             // 
@@ -147,11 +148,11 @@ namespace Zarr
             // pathBox
             // 
             pathBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pathBox.Location = new Point(51, 30);
+            pathBox.Location = new Point(47, 27);
             pathBox.Name = "pathBox";
             pathBox.Size = new Size(433, 23);
             pathBox.TabIndex = 5;
-            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.3/idr0109A/12922361.zarr";
+            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr/";
             // 
             // hScrollBar
             // 
@@ -171,12 +172,21 @@ namespace Zarr
             vScrollBar.TabIndex = 9;
             vScrollBar.Scroll += vScrollBar_Scroll;
             // 
+            // statuslabel
+            // 
+            statuslabel.AutoSize = true;
+            statuslabel.Location = new Point(7, 57);
+            statuslabel.Name = "statuslabel";
+            statuslabel.Size = new Size(0, 15);
+            statuslabel.TabIndex = 10;
+            // 
             // Form1
             // 
             AcceptButton = butGo;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(542, 476);
+            Controls.Add(statuslabel);
             Controls.Add(vScrollBar);
             Controls.Add(hScrollBar);
             Controls.Add(butGo);
@@ -217,5 +227,6 @@ namespace Zarr
         private Button butGo;
         private HScrollBar hScrollBar;
         private VScrollBar vScrollBar;
+        private Label statuslabel;
     }
 }
