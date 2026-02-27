@@ -56,10 +56,12 @@ namespace Zarr
             // 
             // menuStrip1
             // 
+            menuStrip1.ImageScalingSize = new Size(32, 32);
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(542, 24);
+            menuStrip1.Padding = new Padding(11, 4, 0, 4);
+            menuStrip1.Size = new Size(1007, 44);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -67,32 +69,34 @@ namespace Zarr
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { openToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Size = new Size(71, 36);
             fileToolStripMenuItem.Text = "File";
             fileToolStripMenuItem.Click += fileToolStripMenuItem_Click;
             // 
             // openToolStripMenuItem
             // 
             openToolStripMenuItem.Name = "openToolStripMenuItem";
-            openToolStripMenuItem.Size = new Size(124, 22);
+            openToolStripMenuItem.Size = new Size(250, 44);
             openToolStripMenuItem.Text = "Open File";
             openToolStripMenuItem.Click += openToolStripMenuItem_Click;
             // 
             // pictureBox
             // 
             pictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            pictureBox.Location = new Point(0, 75);
+            pictureBox.Location = new Point(0, 160);
+            pictureBox.Margin = new Padding(6);
             pictureBox.Name = "pictureBox";
-            pictureBox.Size = new Size(525, 249);
+            pictureBox.Size = new Size(975, 531);
             pictureBox.TabIndex = 1;
             pictureBox.TabStop = false;
             // 
             // trackBar1
             // 
             trackBar1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            trackBar1.Location = new Point(1, 88);
+            trackBar1.Location = new Point(2, 188);
+            trackBar1.Margin = new Padding(6);
             trackBar1.Name = "trackBar1";
-            trackBar1.Size = new Size(533, 45);
+            trackBar1.Size = new Size(990, 90);
             trackBar1.TabIndex = 2;
             trackBar1.TickStyle = TickStyle.None;
             // 
@@ -100,17 +104,19 @@ namespace Zarr
             // 
             trackBar2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             trackBar2.Location = new Point(0, 0);
+            trackBar2.Margin = new Padding(6);
             trackBar2.Name = "trackBar2";
-            trackBar2.Size = new Size(530, 45);
+            trackBar2.Size = new Size(984, 90);
             trackBar2.TabIndex = 3;
             trackBar2.TickStyle = TickStyle.None;
             // 
             // trackBar3
             // 
             trackBar3.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            trackBar3.Location = new Point(0, 45);
+            trackBar3.Location = new Point(0, 96);
+            trackBar3.Margin = new Padding(6);
             trackBar3.Name = "trackBar3";
-            trackBar3.Size = new Size(530, 45);
+            trackBar3.Size = new Size(984, 90);
             trackBar3.TabIndex = 4;
             trackBar3.TickStyle = TickStyle.None;
             // 
@@ -120,17 +126,19 @@ namespace Zarr
             panel1.Controls.Add(trackBar2);
             panel1.Controls.Add(trackBar1);
             panel1.Controls.Add(trackBar3);
-            panel1.Location = new Point(0, 348);
+            panel1.Location = new Point(0, 742);
+            panel1.Margin = new Padding(6);
             panel1.Name = "panel1";
-            panel1.Size = new Size(537, 126);
+            panel1.Size = new Size(997, 269);
             panel1.TabIndex = 5;
             // 
             // butGo
             // 
             butGo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            butGo.Location = new Point(490, 29);
+            butGo.Location = new Point(910, 62);
+            butGo.Margin = new Padding(6);
             butGo.Name = "butGo";
-            butGo.Size = new Size(35, 23);
+            butGo.Size = new Size(65, 49);
             butGo.TabIndex = 7;
             butGo.Text = "Go";
             butGo.UseVisualStyleBackColor = true;
@@ -139,53 +147,56 @@ namespace Zarr
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(7, 33);
+            label1.Location = new Point(13, 70);
+            label1.Margin = new Padding(6, 0, 6, 0);
             label1.Name = "label1";
-            label1.Size = new Size(34, 15);
+            label1.Size = new Size(65, 32);
             label1.TabIndex = 6;
             label1.Text = "Path:";
             // 
             // pathBox
             // 
             pathBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pathBox.Location = new Point(47, 27);
+            pathBox.Location = new Point(87, 58);
+            pathBox.Margin = new Padding(6);
             pathBox.Name = "pathBox";
-            pathBox.Size = new Size(433, 23);
+            pathBox.Size = new Size(801, 39);
             pathBox.TabIndex = 5;
-            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr/";
+            pathBox.Text = "https://uk1s3.embassy.ebi.ac.uk/idr/zarr/v0.3/idr0075A/9528933.zarr";
             // 
             // hScrollBar
             // 
             hScrollBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            hScrollBar.Location = new Point(1, 327);
+            hScrollBar.Location = new Point(2, 698);
             hScrollBar.Name = "hScrollBar";
-            hScrollBar.Size = new Size(541, 18);
+            hScrollBar.Size = new Size(1005, 18);
             hScrollBar.TabIndex = 8;
             hScrollBar.Scroll += hScrollBar_Scroll;
             // 
             // vScrollBar
             // 
             vScrollBar.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            vScrollBar.Location = new Point(524, 59);
+            vScrollBar.Location = new Point(973, 126);
             vScrollBar.Name = "vScrollBar";
-            vScrollBar.Size = new Size(18, 266);
+            vScrollBar.Size = new Size(18, 567);
             vScrollBar.TabIndex = 9;
             vScrollBar.Scroll += vScrollBar_Scroll;
             // 
             // statuslabel
             // 
             statuslabel.AutoSize = true;
-            statuslabel.Location = new Point(7, 57);
+            statuslabel.Location = new Point(13, 122);
+            statuslabel.Margin = new Padding(6, 0, 6, 0);
             statuslabel.Name = "statuslabel";
-            statuslabel.Size = new Size(0, 15);
+            statuslabel.Size = new Size(0, 32);
             statuslabel.TabIndex = 10;
             // 
             // Form1
             // 
             AcceptButton = butGo;
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(542, 476);
+            ClientSize = new Size(1007, 1015);
             Controls.Add(statuslabel);
             Controls.Add(vScrollBar);
             Controls.Add(hScrollBar);
@@ -196,6 +207,7 @@ namespace Zarr
             Controls.Add(pathBox);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
+            Margin = new Padding(6);
             Name = "Form1";
             Text = "Mainform";
             Load += Form1_Load;

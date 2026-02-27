@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="../../AForgeBio/AForgeBio.csproj" />
+  <Project Path="../../BioLib/BioLib.csproj" />
+  <Project Path="../../ZarrNET/OmeZarr.csproj" />
   <Project Path="ZarrTesting.csproj" />
 </Solution>
