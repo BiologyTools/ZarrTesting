@@ -1,5 +1,7 @@
-﻿using AForge;
+using AForge;
 using BioLib;
+using CSScripting;
+using java.awt;
 using OmeZarr;
 using OmeZarr.Core.OmeZarr;
 using OmeZarr.Core.OmeZarr.Helpers;
@@ -67,156 +69,185 @@ namespace Zarr
         }
         OmeZarrReader omeZarrReader = null;
         public PointD PyramidalOrigin = new PointD(0, 0);
-        public static void EnsureLittleEndian(byte[] data, int elementSize)
-        {
-            if (!BitConverter.IsLittleEndian)
-                SwapEndianness(data, elementSize);
-        }
         public static void SwapEndianness(byte[] data, int elementSize)
         {
+            if (elementSize <= 1)
+                return;
+
             if (data.Length % elementSize != 0)
-                throw new ArgumentException("Invalid element size");
+                throw new ArgumentException(
+                    "Array length must be divisible by element size.");
+
+            int half = elementSize / 2;
 
             for (int i = 0; i < data.Length; i += elementSize)
             {
-                Array.Reverse(data, i, elementSize);
+                int left = i;
+                int right = i + elementSize - 1;
+
+                for (int j = 0; j < half; j++)
+                {
+                    byte tmp = data[left];
+                    data[left] = data[right];
+                    data[right] = tmp;
+
+                    left++;
+                    right--;
+                }
             }
         }
         public static BioImage SelectedImage;
-        private async void butSelectPath_Click(object sender, EventArgs e)
+        private void butSelectPath_Click(object sender, EventArgs e)
         {
-            // -------------------------------------------------------
-            // Snapshot ALL control values before the first await
-            // Everything below this block is potentially off-thread
-            // -------------------------------------------------------
-            string path = pathBox.Text;
-            int picWidth = pictureBox.Width;
-            int picHeight = pictureBox.Height;
-            int scrollX = hScrollBar.Value;
-            int scrollY = vScrollBar.Value;
-            int tVal = trackBar1.Value;
-            int cVal = trackBar2.Value;
-            int zVal = trackBar3.Value;
-
-            try
+            if (SelectedImage == null)
             {
-                // -------------------------------------------------------
-                // Async work — all off UI thread
-                // -------------------------------------------------------
-                if (SelectedImage == null)
-                {
-                    BioImage image = await BioImage.OpenURL(
-                        path,
-                        new AForge.ZCT(tVal, cVal, zVal),
-                        0, 0, picWidth, picHeight)
-                        .ConfigureAwait(false);
+                BioImage image = BioImage.OpenURL(
+                    pathBox.Text,
+                    new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value),
+                    0, 0, pictureBox.Width, pictureBox.Height).Result;
 
-                    SelectedImage = image;
-                }
-
+                SelectedImage = image;
                 if (omeZarrReader == null)
                 {
-                    omeZarrReader = await OmeZarrReader.OpenAsync(path)
-                        .ConfigureAwait(false);
+                    omeZarrReader = OmeZarrReader.OpenAsync(pathBox.Text).Result;
                     reader = omeZarrReader;
                 }
-
-                var imagef = reader.AsMultiscaleImage();
-                var levelf = await imagef.OpenResolutionLevelAsync(0).ConfigureAwait(false);
-                var ress = await imagef.OpenAllResolutionLevelsAsync().ConfigureAwait(false);
-
-                // -------------------------------------------------------
-                // Determine trackbar maximums from shape
-                // -------------------------------------------------------
-                int maxZ = 0, maxC = 0, maxT = 0;
-
-                if (levelf.Shape.Length == 3)
-                {
-                    maxZ = (int)levelf.Shape[0];
-                }
-                else if (levelf.Shape.Length == 4)
-                {
-                    maxC = (int)levelf.Shape[0];
-                    maxZ = (int)levelf.Shape[1];
-                }
-                else if (levelf.Shape.Length == 5)
-                {
-                    maxT = (int)levelf.Shape[0];
-                    maxC = (int)levelf.Shape[1];
-                    maxZ = (int)levelf.Shape[2];
-                }
-
-                // -------------------------------------------------------
-                // Read tile (async, off UI thread)
-                // -------------------------------------------------------
-                string dataType = levelf.DataType;
-
-                System.Drawing.Bitmap renderedBitmap = null;
-
-                if (levelf.Rank > 0)
-                {
-                    var tileResult = await levelf.ReadTileAsync(
-                        scrollX, scrollY,
-                        picWidth, picHeight,
-                        t: tVal, c: cVal, z: zVal)
-                        .ConfigureAwait(false);
-
-                    renderedBitmap = RenderTile(tileResult, dataType, tVal, cVal, zVal);
-                }
-
-                // -------------------------------------------------------
-                // UI updates — back on UI thread via Invoke
-                // -------------------------------------------------------
-                Invoke(() =>
-                {
-                    statuslabel.Text = $"Opened: {reader.RootNodeType}, NGFF {reader.NgffVersion}";
-                    vScrollBar.Maximum = (int)SelectedImage.Resolutions[0].SizeX;
-                    hScrollBar.Maximum = (int)SelectedImage.Resolutions[0].SizeY;
-                    trackBar1.Maximum = maxZ;
-                    trackBar2.Maximum = maxC;
-                    trackBar3.Maximum = maxT;
-
-                    SelectedImage.Coordinate = new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value);
-
-                    if (renderedBitmap != null)
-                        pictureBox.Image = renderedBitmap;
-                });
             }
-            catch (Exception ex)
+            statuslabel.Text = $"Opened: {reader.RootNodeType}, NGFF {reader.NgffVersion}";
+            vScrollBar.Maximum = (int)SelectedImage.Resolutions[0].SizeX;
+            hScrollBar.Maximum = (int)SelectedImage.Resolutions[0].SizeY;
+            var imagef = reader.AsMultiscaleImage();
+            var levelf = imagef.OpenResolutionLevelAsync(0).Result;
+            SelectedImage.levelf = levelf;
+            var ress = imagef.OpenAllResolutionLevelsAsync().Result;
+            if (levelf.Shape.Length == 3)
             {
-                Invoke(() =>
+                trackBar1.Maximum = (int)levelf.Shape[0];
+                trackBar2.Maximum = 0;
+                trackBar3.Maximum = 0;
+                SelectedImage.Coordinate = new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value);
+            }
+            else
+            if (levelf.Shape.Length == 4)
+            {
+                trackBar1.Maximum = (int)levelf.Shape[1];
+                trackBar2.Maximum = (int)levelf.Shape[0];
+                trackBar3.Maximum = 0;
+                SelectedImage.Coordinate = new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value);
+            }
+            else
+            if (levelf.Shape.Length == 5)
+            {
+                trackBar1.Maximum = (int)levelf.Shape[2];
+                trackBar2.Maximum = (int)levelf.Shape[1];
+                trackBar3.Maximum = (int)levelf.Shape[0];
+                SelectedImage.Coordinate = new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value);
+            }
+
+            if (SelectedImage.Resolutions.Count > 1)
+            {
+                try
+                {
+                    if (SelectedImage.levels[0].Rank > 0)
+                    {
+                        var tileResult = SelectedImage.levelf.ReadTileAsync(
+                            hScrollBar.Value, vScrollBar.Value,
+                            pictureBox.Width, pictureBox.Height,
+                            t: trackBar1.Value,
+                            c: trackBar2.Value,
+                            z: trackBar3.Value).Result;
+
+                        var tileWidth = tileResult.Width;
+                        var tileHeight = tileResult.Height;
+                        var bts = tileResult.Data;
+
+                        if (SelectedImage.levelf.DataType == "uint16")
+                        {
+                            AForge.Bitmap bm = new AForge.Bitmap(
+                                "", tileWidth, tileHeight,
+                                AForge.PixelFormat.Format16bppGrayScale,
+                                bts,
+                                new ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value),
+                                0, null, false);
+                            //SwapEndianness(bm.Bytes, 2);
+                            System.Drawing.Bitmap sb = new System.Drawing.Bitmap(
+                                tileWidth, tileHeight, tileWidth * 4,
+                                System.Drawing.Imaging.PixelFormat.Format32bppArgb,
+                                 bm.GetRGBData(BitConverter.IsLittleEndian));
+                            pictureBox.Image = sb;
+                        }
+                        else if (SelectedImage.levelf.DataType == "uint8")
+                        {
+                            AForge.Bitmap bm = new AForge.Bitmap(
+                                "", tileWidth, tileHeight,
+                                AForge.PixelFormat.Format8bppIndexed,
+                                bts,
+                                new ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value),
+                                0);
+                            AForge.Bitmap bmp = bm.GetImageRGBA(true);
+                            System.Drawing.Bitmap sb = new System.Drawing.Bitmap(
+                                tileWidth, tileHeight, tileWidth * 4,
+                                System.Drawing.Imaging.PixelFormat.Format32bppArgb,
+                                bmp.Data);
+                            pictureBox.Image = sb;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
                     MessageBox.Show($"Error opening Zarr file: {ex.Message}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error));
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-        }
-
-        // ---------------------------------------------------------------
-        // Helper — pure data → bitmap conversion, no async, no UI access
-        // ---------------------------------------------------------------
-        private System.Drawing.Bitmap RenderTile(
-            PlaneResult tileResult,
-            string dataType,
-            int t, int c, int z)
-        {
-            var coord = new ZCT(t, c, z);
-            int width = tileResult.Width;
-            int height = tileResult.Height;
-            byte[] data = tileResult.Data;
-
-            AForge.PixelFormat pixelFormat = dataType switch
+            else
             {
-                "uint16" => AForge.PixelFormat.Format16bppGrayScale,
-                "uint8" => AForge.PixelFormat.Format8bppIndexed,
-                _ => throw new NotSupportedException($"Unsupported datatype: {dataType}")
-            };
+                var planef = SelectedImage.levelf.ReadPlaneAsync(
+                    t: trackBar1.Value, c: trackBar2.Value, z: trackBar3.Value);
+                try
+                {
+                    if (SelectedImage.levelf.Rank > 0)
+                    {
+                        if (SelectedImage.levelf.DataType == "uint16")
+                        {
 
-            AForge.Bitmap bm = new AForge.Bitmap("", width, height, pixelFormat, data, coord, 0);
-            AForge.Bitmap bmp = bm.GetImageRGBA(true);
+                            var tileResult = SelectedImage.levelf.ReadTileAsync(
+                                hScrollBar.Value, vScrollBar.Value,
+                                pictureBox.Width, pictureBox.Height,
+                                t: trackBar1.Value, c: trackBar2.Value, z: trackBar3.Value).Result;
 
-            return new System.Drawing.Bitmap(
-                width, height, width * 4,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb,
-                bmp.Data);
+                            var tileWidth = tileResult.Width;
+                            var tileHeight = tileResult.Height;
+
+                            AForge.Bitmap bm = new AForge.Bitmap("", tileWidth, tileHeight,
+                                AForge.PixelFormat.Format16bppGrayScale, tileResult.Data,
+                                new ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value), 0);
+                            AForge.Bitmap bmp = bm.GetImageRGBA(true);
+                            var sb = new System.Drawing.Bitmap(bm.Width, bm.Height, bm.Width * 4,
+                                System.Drawing.Imaging.PixelFormat.Format32bppArgb, bmp.Data);
+                            pictureBox.Image = sb;
+
+                        }
+                        else if (SelectedImage.levelf.DataType == "uint8")
+                        {
+                            var bm = new AForge.Bitmap(
+                                (int)SelectedImage.levelf.Shape[SelectedImage.levelf.Rank - 1],
+                                (int)SelectedImage.levelf.Shape[SelectedImage.levelf.Rank - 2],
+                                AForge.PixelFormat.Format8bppIndexed,
+                                planef.Result.Data,
+                                new AForge.ZCT(trackBar1.Value, trackBar2.Value, trackBar3.Value), "");
+                            var bmp = bm.GetImageRGBA(true);      // was skipping GetImageRGBA � now consistent
+                            var sb = new System.Drawing.Bitmap(bm.Width, bm.Height, bm.Width * 4,
+                                System.Drawing.Imaging.PixelFormat.Format32bppArgb, bmp.Data);
+                            pictureBox.Image = sb;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening Zarr file: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
         private void hScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
